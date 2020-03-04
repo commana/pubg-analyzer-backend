@@ -35,4 +35,19 @@ public class AnalyzerPubgApiTest {
         assertEquals(2, actual.getPlayerRank());
         assertEquals(63, actual.getPlayerCount());
     }
+
+    @Test
+    public void shouldGetAllKilsForPlayer() {
+        PubgClient client = new PubgClient();
+        AnalyzerPubgApi api = new AnalyzerPubgApi(client);
+
+        Player player = new Player("xbox", "Brentarus");
+        List<Match> matches = api.getMatchesForPlayer(new Player("xbox", "Brentarus"));
+        Match m = matches.get(0);
+
+        MatchDetails actual = api.getMatchDetailsForPlayer(m, player);
+
+        // should contain 5 kills, 1 match start, 1 death event
+        assertEquals(5+1+1, actual.getEvents().size());
+    }
 }

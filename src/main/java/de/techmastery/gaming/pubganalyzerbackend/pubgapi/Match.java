@@ -19,13 +19,16 @@ public class Match {
 
     private final int playerCount;
 
-    public Match(String id, String gameMode, ZonedDateTime createdAt, String mapName, int playerRank, int playerCount) {
+    private final String assetLink;
+
+    public Match(String id, String gameMode, ZonedDateTime createdAt, String mapName, int playerRank, int playerCount, String assetLink) {
         this.id = id;
         this.gameMode = gameMode;
         this.createdAt = createdAt;
         this.mapName = mapName;
         this.playerRank = playerRank;
         this.playerCount = playerCount;
+        this.assetLink = assetLink;
     }
 
     public String getId() {
@@ -50,5 +53,9 @@ public class Match {
 
     public int getPlayerCount() {
         return playerCount;
+    }
+
+    public String getAssetLink() {
+        return assetLink;
     }
 }

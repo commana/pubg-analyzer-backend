@@ -2,12 +2,16 @@ package de.techmastery.gaming.pubganalyzerbackend.pubgapi;
 
 import com.github.gplnature.pubgapi.api.PubgClient;
 import com.github.gplnature.pubgapi.exception.PubgClientException;
-import com.github.gplnature.pubgapi.model.Map;
 import com.github.gplnature.pubgapi.model.Platform;
+import com.github.gplnature.pubgapi.model.asset.Asset;
 import com.github.gplnature.pubgapi.model.generic.Entity;
 import com.github.gplnature.pubgapi.model.match.MatchResponse;
 import com.github.gplnature.pubgapi.model.participant.Participant;
+import com.github.gplnature.pubgapi.model.telemetry.Telemetry;
+import com.github.gplnature.pubgapi.model.telemetry.event.LogPlayerKill;
+import com.github.gplnature.pubgapi.model.telemetry.event.TelemetryEvent;
 
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -35,6 +39,8 @@ public class AnalyzerPubgApi implements PubgApi {
                 // getMatch is not rate-limited
                 MatchResponse response = client.getMatch(platform, e.getId());
                 com.github.gplnature.pubgapi.model.match.Match m = response.getData();
+                String assetId = m.getRelationships().getAssets().get(0).getId();
+                Asset asset = (Asset) response.getIncluded().stream().filter(i -> i.getId().equals(assetId)).collect(Collectors.toList()).get(0);
 
                 Stream<Entity> participantStubs = response.getIncluded().stream().filter(p -> p.getType().equals("participant"));
                 Stream<Participant> participantStream = participantStubs.map((Entity ent) -> (Participant)ent);
@@ -43,20 +49,23 @@ public class AnalyzerPubgApi implements PubgApi {
                 int playerCount = participants.size();
                 int playerRank = findPlayer(player, participants).getAttributes().getStats().getWinPlace();
 
-                Map map = m.getAttributes().getMapName();
-
                 matches.add(new Match(
                         m.getId(),
                         m.getAttributes().getGameMode().toString(),
                         m.getAttributes().getCreatedAt(),
-                        // TODO file bug or fork library
-                        map == null ? "Summerland_Main" : map.toString(),
+                        m.getAttributes().getMapName().toString(),
                         playerRank,
-                        playerCount
+                        playerCount,
+                        asset.getAttributes().getUrl()
                 ));
             }
             return matches;
         } catch (PubgClientException e) {
+            if (e.getCause() instanceof SocketTimeoutException) {
+                SocketTimeoutException socketTimeoutException = (SocketTimeoutException) e.getCause();
+                // TODO do something useful with this exception...
+                throw new RuntimeException(socketTimeoutException);
+            }
             throw new RuntimeException(e);
         }
     }
@@ -71,7 +80,38 @@ public class AnalyzerPubgApi implements PubgApi {
     }
 
     @Override
-    public MatchDetails getMatchDetails(Match m) {
-        return null;
+    public MatchDetails getMatchDetailsForPlayer(Match match, Player player) {
+        try {
+            Telemetry telemetry = this.client.getTelemetry(match.getAssetLink());
+            Stream<TelemetryEvent> killsOnly = telemetry.getTelemetryEvents().stream().filter(e -> e.getType().toUpperCase().equals("LOGPLAYERKILL"));
+            Stream<LogPlayerKill> playerKills = killsOnly
+                    .map(e -> (LogPlayerKill)e)
+                    .filter(e -> e.getKiller() != null && e.getKiller().getName().equals(player.getName()));
+            TelemetryEvent gameStart = telemetry.getTelemetryEvents().stream().filter(e -> e.getType().toUpperCase().equals("LOGMATCHSTART")).collect(Collectors.toList()).get(0);
+
+            List<MatchEvent> matchEvents = new ArrayList<>();
+            StartMatchEvent gs = new StartMatchEvent(gameStart.getTimestamp(), gameStart.getCommon().getIsGame().toString());
+            matchEvents.add(gs);
+
+            for (LogPlayerKill k : playerKills.collect(Collectors.toList())) {
+                matchEvents.add(new PlayerKillMatchEvent(k.getTimestamp(), k.getCommon().getIsGame().toString(), k.getVictim().getName()));
+            }
+
+            LogPlayerKill playerDies = telemetry.getTelemetryEvents().stream()
+                    .filter(e -> e.getType().toUpperCase().equals("LOGPLAYERKILL"))
+                    .map(e -> (LogPlayerKill)e)
+                    .filter(e -> e.getVictim() != null && e.getVictim().getName().equals(player.getName()))
+                    .collect(Collectors.toList())
+                    .get(0);
+            matchEvents.add(new PlayerDieMatchEvent(
+                    playerDies.getTimestamp(),
+                    playerDies.getCommon().getIsGame().toString(),
+                    playerDies.getKiller().getName()
+            ));
+
+            return new MatchDetails(matchEvents);
+        } catch (PubgClientException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

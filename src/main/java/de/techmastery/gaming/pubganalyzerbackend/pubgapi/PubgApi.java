@@ -6,6 +6,6 @@ public interface PubgApi {
 
     List<Match> getMatchesForPlayer(Player p);
 
-    MatchDetails getMatchDetails(Match m);
+    MatchDetails getMatchDetailsForPlayer(Match m, Player p);
 
 }
