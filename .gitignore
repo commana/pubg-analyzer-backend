@@ -30,3 +30,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# PUBG-API
+/src/main/resources/reference.conf

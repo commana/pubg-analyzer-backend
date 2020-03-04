@@ -1,0 +1,16 @@
+= PUBG Analyzer Backend
+
+Usage:
+
+Create file `reference.conf` file in `src/main/resource` in your project folder as shown below. The file is ignored by Git.
+
+
+.src/main/resources/reference.conf
+[source,javascript]
+----
+{
+    apiKey: "Your PUBG API key"
+}
+----
+
+You can get an API key from the https://developer.playbattlegrounds.com/[PUBG Developer Site].

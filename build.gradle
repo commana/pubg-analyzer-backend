@@ -15,11 +15,12 @@ repositories {
 }
 
 dependencies {
+	implementation 'com.github.gplnature:pubgapi:0.1.0'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
-	compile("org.springframework.boot:spring-boot-devtools")
+	implementation "org.springframework.boot:spring-boot-devtools"
 }
 
 test {
