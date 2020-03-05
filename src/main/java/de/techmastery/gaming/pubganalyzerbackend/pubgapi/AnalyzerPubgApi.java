@@ -3,7 +3,6 @@ package de.techmastery.gaming.pubganalyzerbackend.pubgapi;
 import com.github.gplnature.pubgapi.api.PubgClient;
 import com.github.gplnature.pubgapi.exception.PubgClientException;
 import com.github.gplnature.pubgapi.model.Platform;
-import com.github.gplnature.pubgapi.model.asset.Asset;
 import com.github.gplnature.pubgapi.model.generic.Entity;
 import com.github.gplnature.pubgapi.model.match.MatchResponse;
 import com.github.gplnature.pubgapi.model.participant.Participant;
@@ -40,7 +39,9 @@ public class AnalyzerPubgApi implements PubgApi {
                 MatchResponse response = client.getMatch(platform, e.getId());
                 com.github.gplnature.pubgapi.model.match.Match m = response.getData();
                 String assetId = m.getRelationships().getAssets().get(0).getId();
-                Asset asset = (Asset) response.getIncluded().stream().filter(i -> i.getId().equals(assetId)).collect(Collectors.toList()).get(0);
+                com.github.gplnature.pubgapi.model.asset.Asset asset =
+                        (com.github.gplnature.pubgapi.model.asset.Asset)
+                                response.getIncluded().stream().filter(i -> i.getId().equals(assetId)).collect(Collectors.toList()).get(0);
 
                 Stream<Entity> participantStubs = response.getIncluded().stream().filter(p -> p.getType().equals("participant"));
                 Stream<Participant> participantStream = participantStubs.map((Entity ent) -> (Participant)ent);
@@ -80,9 +81,9 @@ public class AnalyzerPubgApi implements PubgApi {
     }
 
     @Override
-    public MatchDetails getMatchDetailsForPlayer(Match match, Player player) {
+    public MatchDetails getMatchDetailsForPlayer(Asset asset, Player player) {
         try {
-            Telemetry telemetry = this.client.getTelemetry(match.getAssetLink());
+            Telemetry telemetry = this.client.getTelemetry(asset.getUrl());
             Stream<TelemetryEvent> killsOnly = telemetry.getTelemetryEvents().stream().filter(e -> e.getType().toUpperCase().equals("LOGPLAYERKILL"));
             Stream<LogPlayerKill> playerKills = killsOnly
                     .map(e -> (LogPlayerKill)e)
@@ -97,6 +98,7 @@ public class AnalyzerPubgApi implements PubgApi {
                 matchEvents.add(new PlayerKillMatchEvent(k.getTimestamp(), k.getCommon().getIsGame().toString(), k.getVictim().getName()));
             }
 
+            // Not every player dies ;-)
             LogPlayerKill playerDies = telemetry.getTelemetryEvents().stream()
                     .filter(e -> e.getType().toUpperCase().equals("LOGPLAYERKILL"))
                     .map(e -> (LogPlayerKill)e)
@@ -113,5 +115,30 @@ public class AnalyzerPubgApi implements PubgApi {
         } catch (PubgClientException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private MatchResponse getMatchForPlayerById(Player p, String matchId) throws PubgClientException {
+        return this.client.getMatch(Platform.valueOf(p.getPlatform()), matchId);
+    }
+
+    @Override
+    public MatchDetails getMatchDetailsForPlayer(String matchId, Player p) {
+        try {
+            MatchResponse matchResponse = this.getMatchForPlayerById(p, matchId);
+            com.github.gplnature.pubgapi.model.asset.Asset assetStub = matchResponse.getData().getRelationships().getAssets().get(0);
+            com.github.gplnature.pubgapi.model.asset.Asset asset = findAsset(matchResponse, assetStub);
+            return this.getMatchDetailsForPlayer(new Asset(asset.getAttributes().getUrl()), p);
+        } catch (PubgClientException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private com.github.gplnature.pubgapi.model.asset.Asset findAsset(MatchResponse matchResponse, com.github.gplnature.pubgapi.model.asset.Asset assetStub) {
+        return (com.github.gplnature.pubgapi.model.asset.Asset) matchResponse
+                .getIncluded()
+                .stream()
+                .filter(i -> i.getId().equals(assetStub.getId()) && i.getType().equals(assetStub.getType()))
+                .collect(Collectors.toList())
+                .get(0);
     }
 }

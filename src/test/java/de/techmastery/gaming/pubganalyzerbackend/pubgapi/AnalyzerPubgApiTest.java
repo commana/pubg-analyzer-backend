@@ -32,12 +32,12 @@ public class AnalyzerPubgApiTest {
         Match actual = matches.get(0);
 
         // TODO this will fail once I play more games...
-        assertEquals(2, actual.getPlayerRank());
-        assertEquals(63, actual.getPlayerCount());
+        assertEquals(7, actual.getPlayerRank());
+        assertEquals(89, actual.getPlayerCount());
     }
 
     @Test
-    public void shouldGetAllKilsForPlayer() {
+    public void shouldGetAllKillsForPlayer() {
         PubgClient client = new PubgClient();
         AnalyzerPubgApi api = new AnalyzerPubgApi(client);
 
@@ -45,9 +45,9 @@ public class AnalyzerPubgApiTest {
         List<Match> matches = api.getMatchesForPlayer(new Player("xbox", "Brentarus"));
         Match m = matches.get(0);
 
-        MatchDetails actual = api.getMatchDetailsForPlayer(m, player);
+        MatchDetails actual = api.getMatchDetailsForPlayer(m.getId(), player);
 
-        // should contain 5 kills, 1 match start, 1 death event
-        assertEquals(5+1+1, actual.getEvents().size());
+        // should contain x kills, 1 match start, 1 death event
+        assertEquals(4+1+1, actual.getEvents().size());
     }
 }

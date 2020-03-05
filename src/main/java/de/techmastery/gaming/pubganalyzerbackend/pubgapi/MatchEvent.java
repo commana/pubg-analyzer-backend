@@ -1,7 +1,10 @@
 package de.techmastery.gaming.pubganalyzerbackend.pubgapi;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import java.time.ZonedDateTime;
 
+@JsonTypeInfo(use=JsonTypeInfo.Id.NAME)
 public abstract class MatchEvent {
 
     private final ZonedDateTime timestamp;
