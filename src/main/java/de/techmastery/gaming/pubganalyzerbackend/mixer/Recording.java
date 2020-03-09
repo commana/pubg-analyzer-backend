@@ -36,8 +36,12 @@ public class Recording {
     }
 
     public String getPlaylistUrl() {
+        return this.getBaseUrl() + "manifest.m3u8";
+    }
+
+    public String getBaseUrl() {
         VideoOnDemand vod = vods.stream().filter(v -> v.getFormat().equals("hls")).collect(Collectors.toList()).get(0);
-        return vod.getBaseUrl() + "manifest.m3u8";
+        return vod.getBaseUrl();
     }
 
     public long getId() {

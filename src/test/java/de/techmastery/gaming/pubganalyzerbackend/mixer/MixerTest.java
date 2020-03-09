@@ -29,7 +29,7 @@ public class MixerTest {
         Streamer s = m.getStreamer("Brentarus");
 
         // TODO these will fail at some point
-        assertTrue(s.hasVOD(ZonedDateTime.of(2020, 03, 05, 21, 00, 00, 00, ZoneId.of("UTC"))));
-        assertFalse(s.hasVOD(ZonedDateTime.now()));
+        assertTrue(s.hasRecording(ZonedDateTime.of(2020, 03, 05, 21, 00, 00, 00, ZoneId.of("UTC"))));
+        assertFalse(s.hasRecording(ZonedDateTime.now()));
     }
 }

@@ -12,7 +12,7 @@ public class Streamer {
 
     private List<Recording> recordings;
 
-    public boolean hasVOD(ZonedDateTime eventTime) {
+    public boolean hasRecording(ZonedDateTime eventTime) {
         for (Recording vod : recordings) {
             if (vod.containsTime(eventTime)) {
                 return true;
@@ -21,7 +21,7 @@ public class Streamer {
         return false;
     }
 
-    public Recording getVOD(ZonedDateTime eventTime) {
+    public Recording getRecording(ZonedDateTime eventTime) {
         for (Recording vod : recordings) {
             if (vod.containsTime(eventTime)) {
                 return vod;

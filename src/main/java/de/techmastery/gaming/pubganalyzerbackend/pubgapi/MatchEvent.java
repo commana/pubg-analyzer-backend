@@ -1,6 +1,8 @@
 package de.techmastery.gaming.pubganalyzerbackend.pubgapi;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import de.techmastery.gaming.pubganalyzerbackend.clip.Clip;
+import de.techmastery.gaming.pubganalyzerbackend.clip.ClipInfo;
 
 import java.time.ZonedDateTime;
 
@@ -10,6 +12,8 @@ public abstract class MatchEvent {
     private final ZonedDateTime timestamp;
 
     private final String gamePhase;
+
+    private ClipInfo clip;
 
     public MatchEvent(ZonedDateTime timestamp, String gamePhase) {
         this.timestamp = timestamp;
@@ -22,5 +26,13 @@ public abstract class MatchEvent {
 
     public String getGamePhase() {
         return gamePhase;
+    }
+
+    public ClipInfo getClip() {
+        return clip;
+    }
+
+    public void setClip(ClipInfo clip) {
+        this.clip = clip;
     }
 }

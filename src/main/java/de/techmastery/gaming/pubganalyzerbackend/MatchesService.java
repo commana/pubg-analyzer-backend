@@ -1,5 +1,8 @@
 package de.techmastery.gaming.pubganalyzerbackend;
 
+import de.techmastery.gaming.pubganalyzerbackend.clip.ClipProcessor;
+import de.techmastery.gaming.pubganalyzerbackend.clip.ClipState;
+import de.techmastery.gaming.pubganalyzerbackend.clip.ClipDownloaderCallable;
 import de.techmastery.gaming.pubganalyzerbackend.mixer.Mixer;
 import de.techmastery.gaming.pubganalyzerbackend.mixer.Recording;
 import de.techmastery.gaming.pubganalyzerbackend.mixer.Streamer;
@@ -9,6 +12,7 @@ import de.techmastery.gaming.pubganalyzerbackend.pubgapi.Player;
 import de.techmastery.gaming.pubganalyzerbackend.pubgapi.PubgApi;
 
 import java.util.List;
+import java.util.UUID;
 
 public class MatchesService {
 
@@ -35,13 +39,16 @@ public class MatchesService {
 
         if (this.mixer.hasStreamer(p.getName())) {
             Streamer s = this.mixer.getStreamer(p.getName());
-            if (s.hasVOD(details.getStartTime())) {
-                Recording rec = s.getVOD(details.getStartTime());
-                ClipStatus cs = this.clipProcessor.process(rec, details.getEvents());
-                details.setClipStatus(cs);
+            if (s.hasRecording(details.getStartTime())) {
+                Recording rec = s.getRecording(details.getStartTime());
+                ClipState cs = this.clipProcessor.process(rec, details.getEvents());
             }
         }
 
         return details;
+    }
+
+    public void getClips(UUID clipTaskIdentifier) {
+        List<ClipDownloaderCallable> tasks = this.clipProcessor.getTasksById(clipTaskIdentifier);
     }
 }
