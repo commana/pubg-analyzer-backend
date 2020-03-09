@@ -1,14 +1,13 @@
 package de.techmastery.gaming.pubganalyzerbackend;
 
 import de.techmastery.gaming.pubganalyzerbackend.mixer.Mixer;
+import de.techmastery.gaming.pubganalyzerbackend.mixer.Recording;
 import de.techmastery.gaming.pubganalyzerbackend.mixer.Streamer;
-import de.techmastery.gaming.pubganalyzerbackend.mixer.VideoOnDemand;
 import de.techmastery.gaming.pubganalyzerbackend.pubgapi.Match;
 import de.techmastery.gaming.pubganalyzerbackend.pubgapi.MatchDetails;
 import de.techmastery.gaming.pubganalyzerbackend.pubgapi.Player;
 import de.techmastery.gaming.pubganalyzerbackend.pubgapi.PubgApi;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 
 public class MatchesService {
@@ -37,8 +36,8 @@ public class MatchesService {
         if (this.mixer.hasStreamer(p.getName())) {
             Streamer s = this.mixer.getStreamer(p.getName());
             if (s.hasVOD(details.getStartTime())) {
-                VideoOnDemand vod = s.getVOD(details.getStartTime());
-                ClipStatus cs = this.clipProcessor.process(vod, details.getEvents());
+                Recording rec = s.getVOD(details.getStartTime());
+                ClipStatus cs = this.clipProcessor.process(rec, details.getEvents());
                 details.setClipStatus(cs);
             }
         }

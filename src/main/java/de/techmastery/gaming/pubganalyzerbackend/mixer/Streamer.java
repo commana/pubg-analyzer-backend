@@ -10,10 +10,10 @@ public class Streamer {
 
     private long id;
 
-    private List<VideoOnDemand> vods;
+    private List<Recording> recordings;
 
     public boolean hasVOD(ZonedDateTime eventTime) {
-        for (VideoOnDemand vod : vods) {
+        for (Recording vod : recordings) {
             if (vod.containsTime(eventTime)) {
                 return true;
             }
@@ -21,8 +21,8 @@ public class Streamer {
         return false;
     }
 
-    public VideoOnDemand getVOD(ZonedDateTime eventTime) {
-        for (VideoOnDemand vod : vods) {
+    public Recording getVOD(ZonedDateTime eventTime) {
+        for (Recording vod : recordings) {
             if (vod.containsTime(eventTime)) {
                 return vod;
             }
@@ -38,11 +38,11 @@ public class Streamer {
         this.id = id;
     }
 
-    public List<VideoOnDemand> getVods() {
-        return vods;
+    public List<Recording> getRecordings() {
+        return recordings;
     }
 
-    public void setVods(List<VideoOnDemand> vods) {
-        this.vods = vods;
+    public void setRecordings(List<Recording> vods) {
+        this.recordings = vods;
     }
 }

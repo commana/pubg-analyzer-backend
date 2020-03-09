@@ -1,101 +1,124 @@
 package de.techmastery.gaming.pubganalyzerbackend.mixer;
 
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.google.gson.annotations.SerializedName;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
+import java.time.ZonedDateTime;
 
 public class VideoOnDemand {
-    private String contentId;
-    private List<ContentLocator> contentLocators;
-    private String contentState;
-    private long durationInSeconds;
-    private ZonedDateTime uploadDate;
+    private VideoData data;
+    private String id;
+    private String baseUrl;
+    private String format;
+    private ZonedDateTime createdAt;
+    private ZonedDateTime updatedAt;
+    private long recordingId;
 
-    public String getPlaylistUrl() {
-        return contentLocators.stream()
-                .filter(c -> c.locatorType.equals("SmoothStreaming"))
-                .collect(Collectors.toList())
-                .get(0)
-                .getUri();
+    public VideoData getData() {
+        return data;
     }
 
-    public String getContentId() {
-        return contentId;
+    public void setData(VideoData data) {
+        this.data = data;
     }
 
-    public void setContentId(String contentId) {
-        this.contentId = contentId;
+    public String getId() {
+        return id;
     }
 
-    public List<ContentLocator> getContentLocators() {
-        return contentLocators;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setContentLocators(List<ContentLocator> contentLocators) {
-        this.contentLocators = contentLocators;
+    public String getBaseUrl() {
+        return baseUrl;
     }
 
-    public String getContentState() {
-        return contentState;
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
-    public void setContentState(String contentState) {
-        this.contentState = contentState;
+    public String getFormat() {
+        return format;
     }
 
-    public long getDurationInSeconds() {
-        return durationInSeconds;
+    public void setFormat(String format) {
+        this.format = format;
     }
 
-    public void setDurationInSeconds(long durationInSeconds) {
-        this.durationInSeconds = durationInSeconds;
+    public ZonedDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public ZonedDateTime getUploadDate() {
-        return uploadDate;
+    public void setCreatedAt(ZonedDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public void setUploadDate(ZonedDateTime uploadDate) {
-        this.uploadDate = uploadDate;
+    public ZonedDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
-    public boolean containsTime(ZonedDateTime time) {
-        ZonedDateTime streamStartTime = uploadDate.minusSeconds(durationInSeconds);
-
-        boolean streamStartedBeforeTargetTime = streamStartTime.compareTo(time) < 0;
-        boolean streamEndedAfterTargetTime = uploadDate.compareTo(time) > 0;
-
-        return  streamStartedBeforeTargetTime && streamEndedAfterTargetTime;
+    public void setUpdatedAt(ZonedDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public long getRelativeTime(ZonedDateTime timestamp) {
-        ZonedDateTime streamStartTime = uploadDate.minusSeconds(durationInSeconds);
-
-        return SECONDS.between(streamStartTime, timestamp);
+    public long getRecordingId() {
+        return recordingId;
     }
 
-    private static class ContentLocator {
-        private String locatorType;
-        private String uri;
+    public void setRecordingId(long recordingId) {
+        this.recordingId = recordingId;
+    }
 
-        public String getLocatorType() {
-            return locatorType;
+    private static class VideoData {
+        @SerializedName("Width")
+        private int width;
+        @SerializedName("Height")
+        private int height;
+        @SerializedName("Has720pPreview")
+        private boolean has720pPreview;
+        @SerializedName("Fps")
+        private double fps;
+        @SerializedName("Bitrate")
+        private long bitrate;
+
+        public int getWidth() {
+            return width;
         }
 
-        public void setLocatorType(String locatorType) {
-            this.locatorType = locatorType;
+        public void setWidth(int width) {
+            this.width = width;
         }
 
-        public String getUri() {
-            return uri;
+        public int getHeight() {
+            return height;
         }
 
-        public void setUri(String uri) {
-            this.uri = uri;
+        public void setHeight(int height) {
+            this.height = height;
+        }
+
+        public boolean isHas720pPreview() {
+            return has720pPreview;
+        }
+
+        public void setHas720pPreview(boolean has720pPreview) {
+            this.has720pPreview = has720pPreview;
+        }
+
+        public double getFps() {
+            return fps;
+        }
+
+        public void setFps(double fps) {
+            this.fps = fps;
+        }
+
+        public long getBitrate() {
+            return bitrate;
+        }
+
+        public void setBitrate(long bitrate) {
+            this.bitrate = bitrate;
         }
     }
 }
