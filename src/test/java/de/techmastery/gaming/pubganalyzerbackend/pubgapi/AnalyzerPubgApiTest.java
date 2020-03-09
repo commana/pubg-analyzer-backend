@@ -32,8 +32,8 @@ public class AnalyzerPubgApiTest {
         Match actual = matches.get(0);
 
         // TODO this will fail once I play more games...
-        assertEquals(7, actual.getPlayerRank());
-        assertEquals(89, actual.getPlayerCount());
+        assertEquals(8, actual.getPlayerRank());
+        assertEquals(88, actual.getPlayerCount());
     }
 
     @Test
@@ -47,7 +47,8 @@ public class AnalyzerPubgApiTest {
 
         MatchDetails actual = api.getMatchDetailsForPlayer(m.getId(), player);
 
-        // should contain x kills, 1 match start, 1 death event
-        assertEquals(4+1+1, actual.getEvents().size());
+        // TODO this will fail once I play more games...
+        // should contain 2 kills, 1 match start, 1 death event
+        assertEquals(2+1+1, actual.getEvents().size());
     }
 }
