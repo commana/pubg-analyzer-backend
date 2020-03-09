@@ -111,7 +111,7 @@ public class AnalyzerPubgApi implements PubgApi {
                     playerDies.getKiller().getName()
             ));
 
-            return new MatchDetails(matchEvents);
+            return new MatchDetails(matchEvents, gameStart.getTimestamp());
         } catch (PubgClientException e) {
             throw new RuntimeException(e);
         }

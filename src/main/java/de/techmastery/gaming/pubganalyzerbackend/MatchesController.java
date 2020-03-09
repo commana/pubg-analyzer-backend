@@ -1,6 +1,7 @@
 package de.techmastery.gaming.pubganalyzerbackend;
 
 import com.github.gplnature.pubgapi.api.PubgClient;
+import de.techmastery.gaming.pubganalyzerbackend.mixer.Mixer;
 import de.techmastery.gaming.pubganalyzerbackend.pubgapi.AnalyzerPubgApi;
 import de.techmastery.gaming.pubganalyzerbackend.pubgapi.Match;
 import de.techmastery.gaming.pubganalyzerbackend.pubgapi.MatchDetails;
@@ -17,11 +18,11 @@ public class MatchesController {
 
     @GetMapping("/matches/{platform}/{player}")
     public List<Match> getMatchesForPlayer(@PathVariable("platform") String platform, @PathVariable("player") String player) {
-        return new MatchesService(new AnalyzerPubgApi(new PubgClient())).findRecentMatchesForPlayer(platform, player);
+        return new MatchesService(new AnalyzerPubgApi(new PubgClient()), new Mixer(), new ClipProcessor()).findRecentMatchesForPlayer(platform, player);
     }
 
     @GetMapping("/matches/{platform}/{player}/{matchId}")
     public MatchDetails getMatchDetailsForPlayer(@PathVariable("platform") String platform, @PathVariable("player") String player, @PathVariable("matchId") String matchId) {
-        return new MatchesService(new AnalyzerPubgApi(new PubgClient())).getMatchDetailsForPlayer(platform, player, matchId);
+        return new MatchesService(new AnalyzerPubgApi(new PubgClient()), new Mixer(), new ClipProcessor()).getMatchDetailsForPlayer(platform, player, matchId);
     }
 }
