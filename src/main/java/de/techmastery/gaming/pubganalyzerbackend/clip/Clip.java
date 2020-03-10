@@ -10,4 +10,8 @@ public class Clip {
     public String getUrl() {
         return this.state.getUrl();
     }
+
+    public void updateClipState(ClipState next) {
+        this.state = next;
+    }
 }

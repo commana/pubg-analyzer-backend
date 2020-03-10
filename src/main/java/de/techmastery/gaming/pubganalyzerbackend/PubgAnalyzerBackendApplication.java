@@ -1,5 +1,6 @@
 package de.techmastery.gaming.pubganalyzerbackend;
 
+import de.techmastery.gaming.pubganalyzerbackend.clip.ClipStorage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,11 @@ public class PubgAnalyzerBackendApplication {
 	@Bean
 	public TaskExecutor taskExecutor() {
 		return new ThreadPoolTaskExecutor();
+	}
+
+	@Bean
+	public ClipStorage clipStorage() {
+		return new ClipStorage();
 	}
 
 }

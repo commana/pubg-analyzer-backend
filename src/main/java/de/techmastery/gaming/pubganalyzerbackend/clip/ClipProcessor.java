@@ -18,11 +18,14 @@ public class ClipProcessor {
 
     private final TaskExecutor taskExecutor;
 
-    public ClipProcessor(TaskExecutor taskExecutor) {
+    private final ClipStorage clipStorage;
+
+    public ClipProcessor(TaskExecutor taskExecutor, ClipStorage clipStorage) {
         this.taskExecutor = taskExecutor;
+        this.clipStorage = clipStorage;
     }
 
-    public ClipState process(Recording recording, List<MatchEvent> events) {
+    public ClipState process(Recording recording, ClipIdentifier identifier, List<MatchEvent> events) {
         try {
             WebClient webClient = WebClient.builder().baseUrl(recording.getPlaylistUrl()).build();
             String playListSrc = webClient.method(HttpMethod.GET).exchange().block().bodyToMono(String.class).block();
@@ -34,8 +37,13 @@ public class ClipProcessor {
                 for (MediaSegment segment : playlist.mediaSegments()) {
                     playlistSegmentTime += segment.duration();
                     if (playlistSegmentTime >= seconds) {
+                        Clip c = new Clip(new PendingClipState());
                         ClipDownloaderCallable startTask = new ClipDownloaderCallable(segment, recording.getBaseUrl());
-                        FutureTask<URI> task = new FutureTask<>(new ClipPipeline(startTask));
+                        ClipPipeline pipe = new ClipPipeline(startTask);
+                        pipe.onComplete(c);
+                        clipStorage.put(identifier, c);
+                        FutureTask<URI> task = new FutureTask<>(pipe);
+                        taskExecutor.execute(task);
                         break;
                     }
                 }
@@ -47,4 +55,7 @@ public class ClipProcessor {
         }
     }
 
+    public ClipStorage getClipStorage() {
+        return clipStorage;
+    }
 }

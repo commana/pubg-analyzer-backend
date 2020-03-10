@@ -1,5 +1,7 @@
 package de.techmastery.gaming.pubganalyzerbackend;
 
+import de.techmastery.gaming.pubganalyzerbackend.clip.Clip;
+import de.techmastery.gaming.pubganalyzerbackend.clip.ClipIdentifier;
 import de.techmastery.gaming.pubganalyzerbackend.clip.ClipProcessor;
 import de.techmastery.gaming.pubganalyzerbackend.mixer.Mixer;
 import de.techmastery.gaming.pubganalyzerbackend.mixer.Recording;
@@ -38,7 +40,7 @@ public class MatchesService {
             Streamer s = this.mixer.getStreamer(p.getName());
             if (s.hasRecording(details.getStartTime())) {
                 Recording rec = s.getRecording(details.getStartTime());
-                this.clipProcessor.process(rec, details.getEvents());
+                this.clipProcessor.process(rec, new ClipIdentifier(p, matchId), details.getEvents());
             }
         }
 
@@ -46,10 +48,10 @@ public class MatchesService {
     }
 
     public void getClips(String platform, String name, String matchId) {
-
+        this.clipProcessor.getClipStorage().get(new ClipIdentifier(new Player(platform, name), matchId));
     }
 
-    public void getClip(String platform, String player, String matchId, int index) {
-
+    public Clip getClip(String platform, String name, String matchId, int index) {
+        return this.clipProcessor.getClipStorage().get(new ClipIdentifier(new Player(platform, name), matchId)).get(index);
     }
 }

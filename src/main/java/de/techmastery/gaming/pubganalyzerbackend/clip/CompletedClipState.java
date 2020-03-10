@@ -2,13 +2,14 @@ package de.techmastery.gaming.pubganalyzerbackend.clip;
 
 public class CompletedClipState extends ClipState {
 
-    @Override
-    public String getUrl() {
-        return null;
+    private final String url;
+
+    public CompletedClipState(String url) {
+        this.url = url;
     }
 
     @Override
-    public boolean isFinished() {
-        return true;
+    public String getUrl() {
+        return url;
     }
 }
