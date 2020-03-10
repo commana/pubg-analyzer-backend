@@ -35,8 +35,13 @@ public class MatchesController {
         return new MatchesService(new AnalyzerPubgApi(new PubgClient()), new Mixer(), new ClipProcessor(taskExecutor)).getMatchDetailsForPlayer(platform, player, matchId);
     }
 
-    @GetMapping("/clips/{uuid}")
-    public void getClips(@PathVariable("uuid") UUID clipTaskIdentifier) {
-        new MatchesService(new AnalyzerPubgApi(new PubgClient()), new Mixer(), new ClipProcessor(taskExecutor)).getClips(clipTaskIdentifier);
+    @GetMapping("/clips/{platform}/{player}/{matchId}")
+    public void getClips(@PathVariable("platform") String platform, @PathVariable("player") String player, @PathVariable("matchId") String matchId) {
+        new MatchesService(new AnalyzerPubgApi(new PubgClient()), new Mixer(), new ClipProcessor(taskExecutor)).getClips(platform, player, matchId);
+    }
+
+    @GetMapping("/clips/{platform}/{player}/{matchId}/{index}")
+    public void getClip(@PathVariable("platform") String platform, @PathVariable("player") String player, @PathVariable("matchId") String matchId, @PathVariable("index") int index) {
+        new MatchesService(new AnalyzerPubgApi(new PubgClient()), new Mixer(), new ClipProcessor(taskExecutor)).getClip(platform, player, matchId, index);
     }
 }

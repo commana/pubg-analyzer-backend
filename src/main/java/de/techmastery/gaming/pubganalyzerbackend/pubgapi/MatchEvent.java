@@ -13,8 +13,6 @@ public abstract class MatchEvent {
 
     private final String gamePhase;
 
-    private ClipInfo clip;
-
     public MatchEvent(ZonedDateTime timestamp, String gamePhase) {
         this.timestamp = timestamp;
         this.gamePhase = gamePhase;
@@ -26,13 +24,5 @@ public abstract class MatchEvent {
 
     public String getGamePhase() {
         return gamePhase;
-    }
-
-    public ClipInfo getClip() {
-        return clip;
-    }
-
-    public void setClip(ClipInfo clip) {
-        this.clip = clip;
     }
 }
