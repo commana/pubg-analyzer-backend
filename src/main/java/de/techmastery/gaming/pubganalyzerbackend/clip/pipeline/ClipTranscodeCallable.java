@@ -1,4 +1,4 @@
-package de.techmastery.gaming.pubganalyzerbackend.clip;
+package de.techmastery.gaming.pubganalyzerbackend.clip.pipeline;
 
 import java.io.File;
 import java.io.IOException;

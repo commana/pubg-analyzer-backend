@@ -1,8 +1,8 @@
 package de.techmastery.gaming.pubganalyzerbackend;
 
-import de.techmastery.gaming.pubganalyzerbackend.clip.ClipDownloaderCallable;
-import de.techmastery.gaming.pubganalyzerbackend.clip.ClipPipeline;
-import de.techmastery.gaming.pubganalyzerbackend.clip.ClipUploaderCallable;
+import de.techmastery.gaming.pubganalyzerbackend.clip.pipeline.ClipDownloaderCallable;
+import de.techmastery.gaming.pubganalyzerbackend.clip.pipeline.ClipPipeline;
+import de.techmastery.gaming.pubganalyzerbackend.clip.pipeline.ClipUploaderCallable;
 import io.lindstrom.m3u8.model.MediaSegment;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.task.SyncTaskExecutor;

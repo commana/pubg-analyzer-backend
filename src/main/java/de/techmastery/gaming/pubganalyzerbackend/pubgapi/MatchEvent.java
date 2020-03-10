@@ -1,8 +1,6 @@
 package de.techmastery.gaming.pubganalyzerbackend.pubgapi;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import de.techmastery.gaming.pubganalyzerbackend.clip.Clip;
-import de.techmastery.gaming.pubganalyzerbackend.clip.ClipInfo;
 
 import java.time.ZonedDateTime;
 

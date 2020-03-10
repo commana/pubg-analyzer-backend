@@ -1,4 +1,4 @@
-package de.techmastery.gaming.pubganalyzerbackend.clip;
+package de.techmastery.gaming.pubganalyzerbackend.clip.pipeline;
 
 import io.lindstrom.m3u8.model.MediaSegment;
 import org.slf4j.Logger;

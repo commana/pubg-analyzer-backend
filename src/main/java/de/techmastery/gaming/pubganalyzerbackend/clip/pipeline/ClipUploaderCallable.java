@@ -1,4 +1,4 @@
-package de.techmastery.gaming.pubganalyzerbackend.clip;
+package de.techmastery.gaming.pubganalyzerbackend.clip.pipeline;
 
 import javax.imageio.IIOException;
 import java.io.File;

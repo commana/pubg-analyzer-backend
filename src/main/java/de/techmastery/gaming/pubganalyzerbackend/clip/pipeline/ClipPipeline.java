@@ -1,4 +1,6 @@
-package de.techmastery.gaming.pubganalyzerbackend.clip;
+package de.techmastery.gaming.pubganalyzerbackend.clip.pipeline;
+
+import de.techmastery.gaming.pubganalyzerbackend.clip.*;
 
 import java.io.File;
 import java.net.URI;
@@ -21,7 +23,7 @@ public class ClipPipeline implements Callable<URI> {
         File downloadedFile = startTask.call();
         File transcodedFile = new ClipTranscodeCallable(downloadedFile).call();
         URI result = new ClipUploaderCallable(transcodedFile).call();
-        subscribers.forEach(x -> x.updateClipState(new CompletedClipState(result.toString())));
+        subscribers.forEach(x -> x.updateClipState(new CompletedClipState(new File(result))));
         return result;
     }
 

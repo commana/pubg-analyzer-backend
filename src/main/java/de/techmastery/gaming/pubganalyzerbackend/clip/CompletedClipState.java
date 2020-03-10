@@ -1,15 +1,17 @@
 package de.techmastery.gaming.pubganalyzerbackend.clip;
 
+import java.io.File;
+
 public class CompletedClipState extends ClipState {
 
-    private final String url;
+    private final File localFile;
 
-    public CompletedClipState(String url) {
-        this.url = url;
+    public CompletedClipState(File localFile) {
+        this.localFile = localFile;
     }
 
     @Override
-    public String getUrl() {
-        return url;
+    public File getLocalFile() {
+        return localFile;
     }
 }

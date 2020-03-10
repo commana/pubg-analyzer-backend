@@ -3,6 +3,7 @@ package de.techmastery.gaming.pubganalyzerbackend;
 import de.techmastery.gaming.pubganalyzerbackend.clip.Clip;
 import de.techmastery.gaming.pubganalyzerbackend.clip.ClipIdentifier;
 import de.techmastery.gaming.pubganalyzerbackend.clip.ClipProcessor;
+import de.techmastery.gaming.pubganalyzerbackend.clip.ClipUrl;
 import de.techmastery.gaming.pubganalyzerbackend.mixer.Mixer;
 import de.techmastery.gaming.pubganalyzerbackend.mixer.Recording;
 import de.techmastery.gaming.pubganalyzerbackend.mixer.Streamer;
@@ -12,6 +13,8 @@ import de.techmastery.gaming.pubganalyzerbackend.pubgapi.Player;
 import de.techmastery.gaming.pubganalyzerbackend.pubgapi.PubgApi;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class MatchesService {
 
@@ -40,15 +43,16 @@ public class MatchesService {
             Streamer s = this.mixer.getStreamer(p.getName());
             if (s.hasRecording(details.getStartTime())) {
                 Recording rec = s.getRecording(details.getStartTime());
-                this.clipProcessor.process(rec, new ClipIdentifier(p, matchId), details.getEvents());
+                List<Clip> clips = this.clipProcessor.process(rec, new ClipIdentifier(p, matchId), details.getEvents());
+                details.setClips(IntStream.range(0, clips.size()).mapToObj(i -> new ClipUrl(clips.get(i), i)).collect(Collectors.toList()));
             }
         }
 
         return details;
     }
 
-    public void getClips(String platform, String name, String matchId) {
-        this.clipProcessor.getClipStorage().get(new ClipIdentifier(new Player(platform, name), matchId));
+    public List<Clip> getClips(String platform, String name, String matchId) {
+        return this.clipProcessor.getClipStorage().get(new ClipIdentifier(new Player(platform, name), matchId));
     }
 
     public Clip getClip(String platform, String name, String matchId, int index) {

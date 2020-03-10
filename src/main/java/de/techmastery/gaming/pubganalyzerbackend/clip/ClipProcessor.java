@@ -1,5 +1,7 @@
 package de.techmastery.gaming.pubganalyzerbackend.clip;
 
+import de.techmastery.gaming.pubganalyzerbackend.clip.pipeline.ClipDownloaderCallable;
+import de.techmastery.gaming.pubganalyzerbackend.clip.pipeline.ClipPipeline;
 import de.techmastery.gaming.pubganalyzerbackend.mixer.Recording;
 import de.techmastery.gaming.pubganalyzerbackend.pubgapi.MatchEvent;
 import io.lindstrom.m3u8.model.MediaPlaylist;
@@ -25,8 +27,12 @@ public class ClipProcessor {
         this.clipStorage = clipStorage;
     }
 
-    public ClipState process(Recording recording, ClipIdentifier identifier, List<MatchEvent> events) {
+    public List<Clip> process(Recording recording, ClipIdentifier identifier, List<MatchEvent> events) {
         try {
+            if (!clipStorage.get(identifier).isEmpty()) {
+                return clipStorage.get(identifier);
+            }
+
             WebClient webClient = WebClient.builder().baseUrl(recording.getPlaylistUrl()).build();
             String playListSrc = webClient.method(HttpMethod.GET).exchange().block().bodyToMono(String.class).block();
             MediaPlaylistParser parser = new MediaPlaylistParser();
@@ -34,10 +40,12 @@ public class ClipProcessor {
             for (MatchEvent event : events) {
                 long seconds = recording.getRelativeTimeInSeconds(event.getTimestamp());
                 double playlistSegmentTime = 0;
+                boolean foundClip = false;
                 for (MediaSegment segment : playlist.mediaSegments()) {
                     playlistSegmentTime += segment.duration();
                     if (playlistSegmentTime >= seconds) {
-                        Clip c = new Clip(new PendingClipState());
+                        foundClip = true;
+                        Clip c = new Clip(identifier, new PendingClipState());
                         ClipDownloaderCallable startTask = new ClipDownloaderCallable(segment, recording.getBaseUrl());
                         ClipPipeline pipe = new ClipPipeline(startTask);
                         pipe.onComplete(c);
@@ -47,12 +55,14 @@ public class ClipProcessor {
                         break;
                     }
                 }
-
+                if (!foundClip) {
+                    clipStorage.put(identifier, new Clip(identifier, new NotFoundClipState()));
+                }
             }
-            return null;
         } catch (PlaylistParserException e) {
-            return new NotFoundClipState();
+            clipStorage.put(identifier, new Clip(identifier, new NotFoundClipState()));
         }
+        return clipStorage.get(identifier);
     }
 
     public ClipStorage getClipStorage() {
