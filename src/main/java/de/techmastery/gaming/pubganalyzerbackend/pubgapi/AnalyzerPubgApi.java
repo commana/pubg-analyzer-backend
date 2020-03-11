@@ -86,7 +86,7 @@ public class AnalyzerPubgApi implements PubgApi {
             Telemetry telemetry = this.client.getTelemetry(asset.getUrl());
             Stream<TelemetryEvent> killsOnly = telemetry.getTelemetryEvents().stream().filter(e -> e.getType().toUpperCase().equals("LOGPLAYERKILL"));
             Stream<LogPlayerKill> playerKills = killsOnly
-                    .map(e -> (LogPlayerKill)e)
+                    .map(e -> (LogPlayerKill) e)
                     .filter(e -> e.getKiller() != null && e.getKiller().getName().equals(player.getName()));
             TelemetryEvent gameStart = telemetry.getTelemetryEvents().stream().filter(e -> e.getType().toUpperCase().equals("LOGMATCHSTART")).collect(Collectors.toList()).get(0);
 
@@ -98,19 +98,18 @@ public class AnalyzerPubgApi implements PubgApi {
                 matchEvents.add(new PlayerKillMatchEvent(k.getTimestamp(), k.getCommon().getIsGame().toString(), k.getVictim().getName()));
             }
 
-            // Not every player dies ;-)
-            LogPlayerKill playerDies = telemetry.getTelemetryEvents().stream()
+            List<LogPlayerKill> playerDies = telemetry.getTelemetryEvents().stream()
                     .filter(e -> e.getType().toUpperCase().equals("LOGPLAYERKILL"))
-                    .map(e -> (LogPlayerKill)e)
+                    .map(e -> (LogPlayerKill) e)
                     .filter(e -> e.getVictim() != null && e.getVictim().getName().equals(player.getName()))
-                    .collect(Collectors.toList())
-                    .get(0);
-            matchEvents.add(new PlayerDieMatchEvent(
-                    playerDies.getTimestamp(),
-                    playerDies.getCommon().getIsGame().toString(),
-                    playerDies.getKiller().getName()
-            ));
-
+                    .collect(Collectors.toList());
+            if (playerDies.size() > 0) {
+                matchEvents.add(new PlayerDieMatchEvent(
+                        playerDies.get(0).getTimestamp(),
+                        playerDies.get(0).getCommon().getIsGame().toString(),
+                        playerDies.get(0).getKiller().getName()
+                ));
+            }
             return new MatchDetails(matchEvents, gameStart.getTimestamp());
         } catch (PubgClientException e) {
             throw new RuntimeException(e);
